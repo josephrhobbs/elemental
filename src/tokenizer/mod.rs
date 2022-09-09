@@ -8,7 +8,7 @@ pub enum TokenClass {
     Int,
     Float,
     Assignment,
-    Operator,
+    BinaryOperator,
     Eq,
     Newline,
 }
@@ -160,8 +160,6 @@ impl Tokenizer {
                 continue;
             }
 
-            println!("{}", c);
-
             let token = match c {
                 'a'..='z' | 'A'..='Z' | '_' => {
                     let name = format!(
@@ -169,8 +167,6 @@ impl Tokenizer {
                         c,
                         charstream.get(IDENTIFIER),
                     );
-                    println!("{}", name);
-
                     Token::new(TokenClass::Identifier, name)
                 },
                 '0'..='9' => {
@@ -197,6 +193,7 @@ impl Tokenizer {
                     todo!()
                 },
                 '\n' => Token::new(TokenClass::Newline, '\n'.to_string()),
+                '+' | '-' | '*' | '/' => Token::new(TokenClass::BinaryOperator, c.to_string()),
                 _ => todo!(),
             };
             tokens.push(token);
@@ -222,8 +219,9 @@ impl Tokenizer {
 
     /// Advances the character stream.
     pub fn next(&mut self) -> Option<Token> {
+        let token = self.peek();
         self.index += 1;
-        self.peek()
+        token
     }
 
     /// Returns all tokens without consuming the tokenizer.
@@ -233,15 +231,7 @@ impl Tokenizer {
 }
 
 #[test]
-fn skip_comments() {
-    let input: String = "// A comment\n// Another comment\nx = 1".to_string();
-    let mut charstream = CharStream::from(input);
-    charstream.skip_comments();
-    dbg!(&charstream.consume());
-}
-
-#[test]
-fn tokenize_01() {
+fn tokenize_00() {
     let input: String = "x = 1.3\ny = 2.6".to_string();
     let mut tokenizer = Tokenizer::from(input);
     println!("Tokens: {:#?}", tokenizer.get_tokens());

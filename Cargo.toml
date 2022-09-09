@@ -14,3 +14,4 @@ name = "elemental"
 path = "src/lib.rs"
 
 [dependencies]
+colored = "2.0.0"

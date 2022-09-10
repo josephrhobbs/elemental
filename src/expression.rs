@@ -105,7 +105,7 @@ impl Expression {
                 let expr = match variables.get(s) {
                     Some(e) => (*e).to_owned(),
                     None => {
-                        println!("{}: variable {} has not been declared", "error".red().bold(), s);
+                        print!("{}: variable {} has not been declared", "error".red().bold(), s);
                         return Expression::Nil;
                     },
                 };

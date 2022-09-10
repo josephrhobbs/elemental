@@ -39,15 +39,18 @@ pub mod parselet_utils {
 
 
 /// Interprets a `String` of code into an `Expression`.
-pub fn interpret(variables: &mut HashMap<String, Expression>, code: String) -> Expression {
+/// 
+/// Also returns a boolean value indicating whether or not the output should be displayed.
+pub fn interpret(variables: &mut HashMap<String, Expression>, code: String) -> (Expression, bool) {
     // Create a token stream from the code input.
     let mut tokenizer = Tokenizer::from(code);
+    let is_silent = tokenizer.chk_silent();
 
     // Create a parser and parse from the tokenizer.
     let parser = Parser::new();
     let expression = parser.parse(&mut tokenizer, 0);
 
-    expression.simplify(variables)
+    (expression.simplify(variables), is_silent)
 }
 
 

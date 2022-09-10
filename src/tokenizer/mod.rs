@@ -13,9 +13,10 @@ pub enum TokenClass {
     Multiply,
     Divide,
     Eq,
+    Semicolon,
     Newline,
     OpenParen,
-    CloseParen, 
+    CloseParen,
 }
 
 /// Holds a token's class and its value.
@@ -143,7 +144,7 @@ const NUMERIC: &str = "01235456789.";
 
 
 /// Separators & whitespace.  To be ignored.
-const SEPARATORS: &str = " \t";
+const SEPARATORS: &str = " \t\n";
 
 
 /// Holds a stream of tokens.
@@ -204,6 +205,7 @@ impl Tokenizer {
                 '-' => Token::new(TokenClass::Minus, '-'.to_string()),
                 '*' => Token::new(TokenClass::Multiply, '*'.to_string()),
                 '/' => Token::new(TokenClass::Divide, '/'.to_string()),
+                ';' => Token::new(TokenClass::Semicolon, ';'.to_string()),
                 '(' => Token::new(TokenClass::OpenParen, '('.to_string()),
                 ')' => Token::new(TokenClass::CloseParen, ')'.to_string()),
                 _ => todo!(),
@@ -239,6 +241,13 @@ impl Tokenizer {
     /// Returns all tokens without consuming the tokenizer.
     pub fn get_tokens(&mut self) -> Vec<Token> {
         self.tokens.to_owned()
+    }
+
+    /// Checks whether or not the last token is a semicolon.
+    /// 
+    /// Lines that end with semicolons are not displayed.
+    pub fn chk_silent(&self) -> bool {
+        self.tokens[self.tokens.len() - 1].get_class() == TokenClass::Semicolon
     }
 
     /// Get the precedence of the next token.

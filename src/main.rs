@@ -38,7 +38,16 @@ fn main() -> ! {
             Err(_) => todo!(),
         };
 
-        println!("{}\n", interpret(&mut variables, input.to_owned()).simplify(&mut variables));
+        let (expression, is_silent) = interpret(&mut variables, input.to_owned());
+
+        // Only if it is not "silent", display output
+        if !is_silent {
+            let output = format!(
+                "{}",
+                expression,
+            );
+            println!("\n{}\n", output);
+        }
 
         input.clear();
     }

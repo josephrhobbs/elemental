@@ -11,6 +11,8 @@ use std::{
 
 use colored::*;
 
+use crate::standard::get_std_function;
+
 /// Defines the expression types that are available in Elemental.
 #[derive(Clone, Debug)]
 pub enum Expression {
@@ -30,6 +32,10 @@ pub enum Expression {
         left: Box<Expression>,
         op: String,
         right: Box<Expression>,
+    },
+    Call {
+        name: String,
+        args: Vec<Expression>,
     },
     Nil,
 }
@@ -89,6 +95,12 @@ impl Display for Expression {
             } => {
                 write!(f, "{} {} {}", l, o, r)
             },
+            Expression::Call {
+                name: _,
+                args: _,
+            } => {
+                todo!()
+            }
             Expression::Nil => {
                 write!(f, "")
             },
@@ -197,6 +209,23 @@ impl Expression {
                     cols: *c,
                     values: new,
                 }
+            },
+
+            // To simplify a call, look up the function in the standard library
+            // and pass the arguments necessary
+            Expression::Call {
+                name: n,
+                args: a,
+            } => {
+                let stdfn: fn(Vec<Expression>) -> Expression = get_std_function(n.to_owned());
+
+                // Simplify each value in `a` before passing to the function
+                let mut args = Vec::new();
+                for arg in a {
+                    args.push(arg.simplify(variables));
+                }
+
+                stdfn(args).simplify(variables)
             },
             
             // `Nil` is already in simplest form

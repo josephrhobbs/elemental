@@ -259,7 +259,7 @@ impl Tokenizer {
     }
 
     /// Get the precedence of the next token.
-    pub fn get_next_precedence(&mut self) -> u8 {
+    pub fn get_next_precedence(&self) -> u8 {
         if let Some(t) = self.peek() {
             t.get_class().into()
         } else {

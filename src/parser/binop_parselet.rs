@@ -6,7 +6,7 @@ pub struct BinOpParselet;
 
 impl InfixParselet for BinOpParselet {
     fn parse(&self, parser: &Parser, tokenizer: &mut Tokenizer, token: Token, left: Expression) -> Expression {
-        let right = parser.parse(tokenizer, 0);
+        let right = parser.parse(tokenizer, token.get_class().into());
 
         Expression::BinOp {
             left: Box::new(left),

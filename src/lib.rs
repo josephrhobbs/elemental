@@ -152,7 +152,6 @@ impl Expression {
             Expression::Int (_) => self.to_owned(),
             Expression::Float (_) => self.to_owned(),
             _ => {
-                dbg!(&self);
                 todo!()
             },
         }

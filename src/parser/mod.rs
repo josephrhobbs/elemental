@@ -4,6 +4,7 @@ mod identifier_parselet;
 mod literal_parselet;
 mod assignment_parselet;
 mod binop_parselet;
+mod paren_parselet;
 
 use std::collections::HashMap;
 
@@ -18,6 +19,23 @@ use identifier_parselet::IdentifierParselet;
 use literal_parselet::LiteralParselet;
 use assignment_parselet::AssignmentParselet;
 use binop_parselet::BinOpParselet;
+use paren_parselet::ParenParselet;
+
+
+/// Converts a token class into a precedence value.
+impl From<TokenClass> for u8 {
+    fn from(t: TokenClass) -> u8 {
+        match t {
+            TokenClass::Assignment => 1,
+            TokenClass::Plus => 3,
+            TokenClass::Minus => 3,
+            TokenClass::Multiply => 4,
+            TokenClass::Divide => 4,
+            TokenClass::OpenParen => 5,
+            _ => 0,
+        }
+    }
+}
 
 
 /// Abstracts over "prefix parselets".
@@ -47,8 +65,12 @@ impl Parser {
         prefix_parselets.insert(TokenClass::Identifier, Box::new(IdentifierParselet {}));
         prefix_parselets.insert(TokenClass::Int, Box::new(LiteralParselet {}));
         prefix_parselets.insert(TokenClass::Float, Box::new(LiteralParselet {}));
+        prefix_parselets.insert(TokenClass::OpenParen, Box::new(ParenParselet {}));
         infix_parselets.insert(TokenClass::Assignment, Box::new(AssignmentParselet {}));
-        infix_parselets.insert(TokenClass::BinaryOperator, Box::new(BinOpParselet {}));
+        infix_parselets.insert(TokenClass::Plus, Box::new(BinOpParselet {}));
+        infix_parselets.insert(TokenClass::Minus, Box::new(BinOpParselet {}));
+        infix_parselets.insert(TokenClass::Multiply, Box::new(BinOpParselet {}));
+        infix_parselets.insert(TokenClass::Divide, Box::new(BinOpParselet {}));
 
         Self {
             prefix_parselets,
@@ -57,7 +79,7 @@ impl Parser {
     }
 
     /// Parse code into an expression.
-    pub fn parse(&self, tokenizer: &mut Tokenizer, _precedence: u8) -> Expression {
+    pub fn parse(&self, tokenizer: &mut Tokenizer, precedence: u8) -> Expression {
         let token = match tokenizer.next() {
             Some(t) => t,
             None => todo!(),
@@ -67,17 +89,23 @@ impl Parser {
             Some(p) => p,
             None => todo!(),
         };
-        let left = parselet.parse(self, tokenizer, token);
+        let mut left = parselet.parse(self, tokenizer, token);
 
-        let next = match tokenizer.next() {
-            Some(t) => t,
-            None => return left,
-        };
-        let parselet: &Box<dyn InfixParselet> = match self.infix_parselets.get(&next.get_class()) {
-            Some(p) => p,
-            None => return left,
-        };
+        while precedence < tokenizer.get_next_precedence() {
+            let next = match tokenizer.peek() {
+                Some(t) => t,
+                None => break,
+            };
+            
+            let parselet: &Box<dyn InfixParselet> = match self.infix_parselets.get(&next.get_class()) {
+                Some(p) => p,
+                None => break,
+            };
+            tokenizer.next();
 
-        parselet.parse(self, tokenizer, next, left)
+            left = parselet.parse(self, tokenizer, next, left);
+        }
+
+        left
     }
 }

@@ -8,9 +8,14 @@ pub enum TokenClass {
     Int,
     Float,
     Assignment,
-    BinaryOperator,
+    Plus,
+    Minus,
+    Multiply,
+    Divide,
     Eq,
     Newline,
+    OpenParen,
+    CloseParen, 
 }
 
 /// Holds a token's class and its value.
@@ -193,7 +198,12 @@ impl Tokenizer {
                     todo!()
                 },
                 '\n' => Token::new(TokenClass::Newline, '\n'.to_string()),
-                '+' | '-' | '*' | '/' => Token::new(TokenClass::BinaryOperator, c.to_string()),
+                '+' => Token::new(TokenClass::Plus, '+'.to_string()),
+                '-' => Token::new(TokenClass::Minus, '-'.to_string()),
+                '*' => Token::new(TokenClass::Multiply, '*'.to_string()),
+                '/' => Token::new(TokenClass::Divide, '/'.to_string()),
+                '(' => Token::new(TokenClass::OpenParen, '('.to_string()),
+                ')' => Token::new(TokenClass::CloseParen, ')'.to_string()),
                 _ => todo!(),
             };
             tokens.push(token);
@@ -227,6 +237,15 @@ impl Tokenizer {
     /// Returns all tokens without consuming the tokenizer.
     pub fn get_tokens(&mut self) -> Vec<Token> {
         self.tokens.to_owned()
+    }
+
+    /// Get the precedence of the next token.
+    pub fn get_next_precedence(&mut self) -> u8 {
+        if let Some(t) = self.peek() {
+            t.class.into()
+        } else {
+            0
+        }
     }
 }
 

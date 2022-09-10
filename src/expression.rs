@@ -69,13 +69,15 @@ impl Expression {
     pub fn simplify(&self, variables: &mut HashMap<String, Expression>) -> Self {
         match self {
             Expression::Identifier (s) => {
-                match variables.get(s) {
+                let expr = match variables.get(s) {
                     Some(e) => (*e).to_owned(),
                     None => {
                         print!("{}: variable {} has not been declared", "error".red().bold(), s);
                         return Expression::Nil;
                     },
-                }
+                };
+                // Simplify again
+                expr.simplify(variables)
             },
             Expression::Assignment {
                 identifier: ref i,
@@ -92,7 +94,7 @@ impl Expression {
                 // Simplify the left-hand and right-hand sides
                 let left = l.simplify(variables);
                 let right = r.simplify(variables);
-
+                
                 if let Expression::Int (l) = left {
                     if let Expression::Int (r) = right {
                         Expression::Int (binop_int(l, r, &o))

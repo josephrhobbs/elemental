@@ -28,10 +28,10 @@ impl From<TokenClass> for u8 {
         match t {
             TokenClass::Assignment => 1,
             TokenClass::OpenParen => 2,
-            TokenClass::Multiply => 3,
-            TokenClass::Divide => 3,
-            TokenClass::Plus => 4,
-            TokenClass::Minus => 4,
+            TokenClass::Multiply => 4,
+            TokenClass::Divide => 4,
+            TokenClass::Plus => 3,
+            TokenClass::Minus => 3,
             _ => 0,
         }
     }

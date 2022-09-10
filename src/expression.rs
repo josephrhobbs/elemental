@@ -21,6 +21,11 @@ pub enum Expression {
     Identifier (String),
     Int (i64),
     Float (f64),
+    Matrix {
+        rows: usize,
+        cols: usize,
+        values: Vec<Expression>,
+    },
     BinOp {
         left: Box<Expression>,
         op: String,
@@ -50,6 +55,33 @@ impl Display for Expression {
             Expression::Float (float) => {
                 write!(f, "{:.8}", float)
             },
+            Expression::Matrix {
+                rows: r,
+                cols: c,
+                values: v,
+            } => {
+                let mut result = String::new();
+                for i in 0..*r {
+                    result.push('[');
+                    for j in 0..*c {
+                        let index = i*c + j;
+                        result.push_str(
+                            &format!(
+                                "{:^8}",
+                                format!("{}", v[index as usize])
+                            )
+                        );
+
+                        // Write a tab if we're not at the end yet
+                        if j != c - 1 {
+                            result.push(' ');
+                        }
+                    }
+                    result.push(']');
+                    result.push('\n');
+                }
+                write!(f, "{}", result)
+            }
             Expression::BinOp {
                 left: l,
                 op: o,
@@ -121,6 +153,24 @@ impl Expression {
                     } else {
                         todo!()
                     }
+                } else if let Expression::Matrix {
+                    rows: r,
+                    cols: k1,
+                    values: vl,
+                } = left {
+                    if let Expression::Matrix {
+                        rows: k2,
+                        cols: c,
+                        values: vr,
+                    } = right {
+                        if k1 != k2 {
+                            todo!()
+                        }
+
+                        matrix_dot(vl, vr, r, c, k1)
+                    } else {
+                        todo!()
+                    }
                 } else {
                     todo!()
                 }
@@ -129,6 +179,25 @@ impl Expression {
             // `Int` and `Float` are both already in simplest form
             Expression::Int (_) => self.to_owned(),
             Expression::Float (_) => self.to_owned(),
+            
+            // To simplify a `Matrix`, simplify each value
+            Expression::Matrix {
+                rows: r,
+                cols: c,
+                values: v,
+            } => {
+                let mut new = Vec::new();
+
+                for val in v {
+                    new.push(val.simplify(variables));
+                }
+
+                Expression::Matrix {
+                    rows: *r,
+                    cols: *c,
+                    values: new,
+                }
+            },
             
             // `Nil` is already in simplest form
             Expression::Nil => self.to_owned(),
@@ -157,5 +226,38 @@ pub fn binop_float(x: f64, y: f64, binop: &str) -> f64 {
         "*" => x * y,
         "/" => x / y,
         _ => todo!(),
+    }
+}
+
+
+/// Computes the dot product of two matrices.
+pub fn matrix_dot(left: Vec<Expression>, right: Vec<Expression>, rows: usize, cols: usize, count: usize) -> Expression {
+    let mut values = Vec::new();
+    for i in 0..rows {
+        for j in 0..cols {
+            let mut cell = Expression::Int (0);
+            for k in 0..count {
+                // Add the addend to the cell
+                let addend = Expression::BinOp {
+                    left: Box::new(left[i*count + k].to_owned()),
+                    right: Box::new(right[k*cols + j].to_owned()),
+                    op: "*".to_string(),
+                };
+
+                cell = Expression::BinOp {
+                    left: Box::new(cell),
+                    right: Box::new(addend),
+                    op: "+".to_string(),
+                };
+            }
+            // Push the cell to the list of values
+            values.push(cell.simplify(&mut HashMap::new()));
+        }
+    }
+
+    Expression::Matrix {
+        rows,
+        cols,
+        values,
     }
 }

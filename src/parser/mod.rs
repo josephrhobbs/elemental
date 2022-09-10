@@ -5,6 +5,7 @@ mod literal_parselet;
 mod assignment_parselet;
 mod binop_parselet;
 mod paren_parselet;
+mod matrix_parselet;
 
 use std::collections::HashMap;
 
@@ -20,6 +21,7 @@ use literal_parselet::LiteralParselet;
 use assignment_parselet::AssignmentParselet;
 use binop_parselet::BinOpParselet;
 use paren_parselet::ParenParselet;
+use matrix_parselet::MatrixParselet;
 
 
 /// Converts a token class into a precedence value.
@@ -66,6 +68,7 @@ impl Parser {
         prefix_parselets.insert(TokenClass::Int, Box::new(LiteralParselet {}));
         prefix_parselets.insert(TokenClass::Float, Box::new(LiteralParselet {}));
         prefix_parselets.insert(TokenClass::OpenParen, Box::new(ParenParselet {}));
+        prefix_parselets.insert(TokenClass::OpenBracket, Box::new(MatrixParselet {}));
         infix_parselets.insert(TokenClass::Assignment, Box::new(AssignmentParselet {}));
         infix_parselets.insert(TokenClass::Plus, Box::new(BinOpParselet {}));
         infix_parselets.insert(TokenClass::Minus, Box::new(BinOpParselet {}));
@@ -82,7 +85,7 @@ impl Parser {
     pub fn parse(&self, tokenizer: &mut Tokenizer, precedence: u8) -> Expression {
         let token = match tokenizer.next() {
             Some(t) => t,
-            None => todo!(),
+            None => return Expression::Nil,
         };
 
         let parselet: &Box<dyn PrefixParselet> = match self.prefix_parselets.get(&token.get_class()) {

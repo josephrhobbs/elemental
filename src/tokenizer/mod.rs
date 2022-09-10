@@ -17,6 +17,8 @@ pub enum TokenClass {
     Newline,
     OpenParen,
     CloseParen,
+    OpenBracket,
+    CloseBracket,
 }
 
 /// Holds a token's class and its value.
@@ -208,6 +210,8 @@ impl Tokenizer {
                 ';' => Token::new(TokenClass::Semicolon, ';'.to_string()),
                 '(' => Token::new(TokenClass::OpenParen, '('.to_string()),
                 ')' => Token::new(TokenClass::CloseParen, ')'.to_string()),
+                '[' => Token::new(TokenClass::OpenBracket, '['.to_string()),
+                ']' => Token::new(TokenClass::CloseBracket, ']'.to_string()),
                 _ => todo!(),
             };
             tokens.push(token);
@@ -247,7 +251,11 @@ impl Tokenizer {
     /// 
     /// Lines that end with semicolons are not displayed.
     pub fn chk_silent(&self) -> bool {
-        self.tokens[self.tokens.len() - 1].get_class() == TokenClass::Semicolon
+        if self.tokens.len() != 0 {
+            self.tokens.len() != 0 && self.tokens[self.tokens.len() - 1].get_class() == TokenClass::Semicolon
+        } else {
+            true
+        }
     }
 
     /// Get the precedence of the next token.

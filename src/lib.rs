@@ -99,7 +99,7 @@ impl Display for Expression {
 }
 
 impl Expression {
-    /// Simplify this expression.
+    /// Simplify this expression, given a reference to a list of variables.
     pub fn simplify(&self, variables: &mut HashMap<String, Expression>) -> Self {
         match self {
             Expression::Identifier (s) => {

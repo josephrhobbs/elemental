@@ -105,8 +105,9 @@ impl CharStream {
     /// is not in the given superstring, stops and returns the `String`.
     pub fn get(&mut self, superstring: &str) -> String {
         let mut current = String::new();
-        while let Some(c) = self.next() {
+        while let Some(c) = self.peek() {
             if superstring.contains(c) {
+                self.next();
                 current.push(c);
             } else {
                 break;
@@ -121,6 +122,7 @@ impl CharStream {
             while self.peek() != Some('\n') {
                 self.next();
             }
+            // Consume the newline
             self.next();
         }
     }
@@ -242,7 +244,7 @@ impl Tokenizer {
     /// Get the precedence of the next token.
     pub fn get_next_precedence(&mut self) -> u8 {
         if let Some(t) = self.peek() {
-            t.class.into()
+            t.get_class().into()
         } else {
             0
         }

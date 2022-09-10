@@ -127,33 +127,59 @@ impl Expression {
                 let left = l.simplify(variables);
                 let right = r.simplify(variables);
 
-                match o.as_str() {
-                    "+" => if let Expression::Int (l) = left {
-                        if let Expression::Int (r) = right {
-                            Expression::Int (l + r)
-                        } else if let Expression::Float (r) = right {
-                            let left_float = l as f64;
-                            Expression::Float (left_float + r)
-                        } else {
-                            todo!()
-                        }
-                    } else if let Expression::Float (l) = left {
-                        if let Expression::Int (r) = right {
-                            let right_float = r as f64;
-                            Expression::Float (l + right_float)
-                        } else if let Expression::Float (r) = right {
-                            Expression::Float (l + r)
-                        } else {
-                            todo!()
-                        }
+                if let Expression::Int (l) = left {
+                    if let Expression::Int (r) = right {
+                        Expression::Int (binop_int(l, r, &o))
+                    } else if let Expression::Float (r) = right {
+                        let left_float = l as f64;
+                        Expression::Float (binop_float(left_float, r, &o))
                     } else {
                         todo!()
                     }
-                    _ => todo!(),
+                } else if let Expression::Float (l) = left {
+                    if let Expression::Int (r) = right {
+                        let right_float = r as f64;
+                        Expression::Float (binop_float(l, right_float, &o))
+                    } else if let Expression::Float (r) = right {
+                        Expression::Float (binop_float(l, r, &o))
+                    } else {
+                        todo!()
+                    }
+                } else {
+                    todo!()
                 }
             },
-            expression => expression.to_owned(),
+            Expression::Int (_) => self.to_owned(),
+            Expression::Float (_) => self.to_owned(),
+            _ => {
+                dbg!(&self);
+                todo!()
+            },
         }
+    }
+}
+
+
+/// Executes the given binary operation on two integers.
+pub fn binop_int(x: i64, y: i64, binop: &str) -> i64 {
+    match binop {
+        "+" => x + y,
+        "-" => x - y,
+        "*" => x * y,
+        "/" => x / y,
+        _ => todo!(),
+    }
+}
+
+
+/// Executes the given binary operation on two floats.
+pub fn binop_float(x: f64, y: f64, binop: &str) -> f64 {
+    match binop {
+        "+" => x + y,
+        "-" => x - y,
+        "*" => x * y,
+        "/" => x / y,
+        _ => todo!(),
     }
 }
 
@@ -165,26 +191,7 @@ pub fn interpret(variables: &mut HashMap<String, Expression>, code: String) -> E
 
     // Create a parser and parse from the tokenizer.
     let parser = Parser::new();
-    let mut expression = parser.parse(&mut tokenizer, 0);
-
-    // dbg!(&expression);
-
-    if let Expression::Identifier (s) = expression {
-        // Look up this variable
-        expression = match variables.get(&s) {
-            Some(e) => (*e).to_owned(),
-            None => {
-                print!("{}: variable {} has not been declared", "error".red().bold(), s);
-                return Expression::Nil;
-            },
-        };
-    } else if let Expression::Assignment {
-        // Assign to this variable
-        identifier: ref i,
-        value: ref v,
-    } = expression {
-        variables.insert(i.to_owned(), *v.to_owned());
-    }
+    let expression = parser.parse(&mut tokenizer, 0);
 
     expression.simplify(variables)
 }

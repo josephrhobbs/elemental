@@ -38,7 +38,7 @@ fn main() -> ! {
             Err(_) => todo!(),
         };
 
-        println!("{}\n", interpret(&mut variables, input.to_owned()));
+        println!("{}\n", interpret(&mut variables, input.to_owned()).simplify(&mut variables));
 
         input.clear();
     }

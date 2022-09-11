@@ -110,21 +110,9 @@ impl Sub for Matrix {
 impl Mul for Matrix {
     type Output = Self;
 
+    #[allow(unused_variables)]
     fn mul(self, other: Self) -> Self {
-        if self.rows() != other.cols() || self.cols() != other.rows() {
-            todo!()
-        }
-
-        let mut output_vals = Vec::new();
-
-        for (i, j) in self.vals().iter().zip(other.vals().iter()) {
-            output_vals.push(i + j);
-        }
-
-        Self {
-            vals: output_vals,
-            ..self
-        }
+        todo!()
     }
 }
 

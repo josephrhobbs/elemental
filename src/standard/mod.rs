@@ -33,15 +33,17 @@ fn transpose(args: Vec<Matrix>) -> Matrix {
     }
 
     let matrix = args[0].clone();
-    let mut result = matrix.clone();
+    let mut result = matrix.copy_vals();
+    let cols = matrix.rows();
+    let rows = matrix.cols();
 
     for i in 0..matrix.rows() {
         for j in 0..matrix.cols() {
-            result[[i, j]] = matrix[[j, i]]
+            result[j*cols + i] = matrix[[i, j]];
         }
     }
 
-    result
+    Matrix::new(rows, cols, result)
 }
 
 /// Compute the determinant of a matrix.

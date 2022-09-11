@@ -153,6 +153,26 @@ impl Expression {
                     } else if let Expression::Float (r) = right {
                         let left_float = l as f64;
                         Expression::Float (binop_float(left_float, r, &o))
+                    } else if let Expression::Matrix {
+                        rows: r,
+                        cols: c,
+                        values: v,
+                    } = right {
+                        let mut values = Vec::new();
+
+                        for val in v {
+                            values.push(Expression::BinOp {
+                                left: Box::new(left.to_owned()),
+                                op: "*".to_string(),
+                                right: Box::new(val),
+                            }.simplify(variables)); 
+                        }
+
+                        Expression::Matrix {
+                            rows: r,
+                            cols: c,
+                            values,
+                        }
                     } else {
                         todo!()
                     }

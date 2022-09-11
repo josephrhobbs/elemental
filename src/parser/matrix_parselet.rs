@@ -61,6 +61,8 @@ impl PrefixParselet for MatrixParselet {
             }
         }
 
+        tokenizer.next();
+
         let rows = values.len()/cols as usize;
 
         Expression::Matrix {

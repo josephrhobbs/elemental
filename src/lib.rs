@@ -7,6 +7,7 @@ mod tokenizer;
 mod parser;
 mod standard;
 mod expression;
+mod matrix;
 
 pub use tokenizer::{
     Token,
@@ -15,8 +16,8 @@ pub use tokenizer::{
 };
 
 pub use parser::Parser;
-
 pub use expression::Expression;
+pub use matrix::Matrix;
 
 
 /// Allows parselet files to easily access necessary

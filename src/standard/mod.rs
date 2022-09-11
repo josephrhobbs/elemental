@@ -6,16 +6,17 @@
 
 use std::collections::HashMap;
 
-use crate::Expression;
+use crate::Matrix;
 
 
 /// Get a function pointer based on that function's name.
-pub fn get_std_function(name: String) -> fn(Vec<Expression>) -> Expression {
-    let mut hashmap: HashMap<String, fn(Vec<Expression>) -> Expression> = HashMap::new();
+pub fn get_std_function(name: String) -> fn(Vec<Matrix>) -> Matrix {
+    let mut hashmap: HashMap<String, fn(Vec<Matrix>) -> Matrix> = HashMap::new();
 
     // Declarative standard library begins here
     hashmap.insert("t".to_string(), transpose);
     hashmap.insert("det".to_string(), determinant);
+    hashmap.insert("i".to_string(), identity);
 
     match hashmap.get(&name) {
         Some(f) => *f,
@@ -25,110 +26,108 @@ pub fn get_std_function(name: String) -> fn(Vec<Expression>) -> Expression {
 
 
 /// Transpose a matrix.
-fn transpose(args: Vec<Expression>) -> Expression {
+fn transpose(args: Vec<Matrix>) -> Matrix {
     if args.len() != 1 {
+        // Too many arguments passed!
         todo!()
     }
 
-    if let Expression::Matrix {
-        rows: r,
-        cols: c,
-        values: v,
-    } = &args[0] {
-        let mut return_values = vec![Expression::Nil; r*c];
+    let matrix = args[0].clone();
+    let mut result = matrix.clone();
 
-        for i in 0..*r {
-            for j in 0..*c {
-                return_values[j*r + i] = v[i*c + j].to_owned();
+    for i in 0..matrix.rows() {
+        for j in 0..matrix.cols() {
+            result[[i, j]] = matrix[[j, i]]
+        }
+    }
+
+    result
+}
+
+/// Compute the determinant of a matrix.
+fn determinant(args: Vec<Matrix>) -> Matrix {
+    if args.len() != 1 {
+        // Too many arguments passed!
+        todo!()
+    }
+
+    let matrix = args[0].clone();
+    
+    if matrix.rows() != matrix.cols() {
+        // Square matrices only
+        todo!()
+    }
+
+    let dim = matrix.rows();
+
+    let det = if dim == 2 {
+        matrix[[0, 0]] * matrix[[1, 1]] - matrix[[1, 0]] * matrix[[0, 1]]
+    } else {
+        let mut d = 0.0f64;
+
+        let mut sign = 1.0;
+
+        // Laplace-expand the matrix down the first column
+        for i in 0..dim {
+            let minors = get_minors(&matrix, i, 0);
+
+            d += matrix[[i, 0]] * determinant(vec![minors])[[0, 0]] * sign;
+
+            if sign == 1.0 {
+                sign = -1.0;
+            } else {
+                sign = 1.0;
             }
         }
 
-        Expression::Matrix {
-            rows: *c,
-            cols: *r,
-            values: return_values,
+        d
+    };
+
+    Matrix::new(1, 1, vec![det])
+}
+
+/// Gets the matrix of minors (excluding row `row` and column `col`) given the values of a matrix.
+fn get_minors(matrix: &Matrix, row: usize, col: usize) -> Matrix {
+    let mut values = Vec::new();
+
+    let rows = matrix.rows();
+    let cols = matrix.cols();
+
+    for i in 0..rows {
+        for j in 0..cols {
+            if i != row && j != col {
+                values.push(matrix[[i, j]])
+            }
         }
-    } else {
-        todo!()
     }
+
+    Matrix::new(rows - 1, cols - 1, values)
 }
 
 
-/// Compute the determinant of a matrix.
-fn determinant(args: Vec<Expression>) -> Expression {
+/// Generates an identity matrix of dimension `matrix[[0, 0]]`.
+fn identity(args: Vec<Matrix>) -> Matrix {
     if args.len() != 1 {
         todo!()
     }
 
-    if let Expression::Matrix {
-        rows: r,
-        cols: c,
-        values: v,
-    } = &args[0] {
-        if *r != *c {
-            todo!()
-        }
-        det_matrix(v.to_owned())
-    } else {
+    let matrix = args[0].clone();
+
+    if matrix.rows() != 1 || matrix.cols() != 1 {
         todo!()
     }
-}
 
-/// Gets the matrix of minors (excluding row `row` and column `1`) given the values of a matrix.
-fn get_minors(values: Vec<Expression>, cols: usize, row: usize) -> Vec<Expression> {
-    let mut output = Vec::new();
+    let dim = matrix[[0, 0]] as usize;
 
-    for i in 0..values.len() {
-        if i%cols != 0 && i/cols != row {
-            output.push(values[i].to_owned());
+    let mut output = Matrix::new(dim, dim, vec![0.0; dim*dim]);
+
+    for i in 0..dim {
+        for j in 0..dim {
+            if i == j {
+                output[[i, j]] = 1.0;
+            }
         }
     }
 
     output
-}
-
-/// Pure implementation of `determinant` for recursive calls.
-fn det_matrix(values: Vec<Expression>) -> Expression {
-    let dim = (values.len() as f64).sqrt() as usize;
-    if dim == 1 {
-        values[0].to_owned()
-    } else if dim == 2 {
-        Expression::BinOp {
-            left: Box::new(Expression::BinOp {
-                left: Box::new(values[0].to_owned()),
-                op: "*".to_string(),
-                right: Box::new(values[3].to_owned()),
-            }),
-            right: Box::new(Expression::BinOp {
-                left: Box::new(values[1].to_owned()),
-                op: "*".to_string(),
-                right: Box::new(values[2].to_owned()),
-            }),
-            op: "-".to_string(),
-        }
-    } else {
-        let mut determinant = Expression::Int (0);
-
-        let mut operator = String::from("+");
-
-        for i in 0..dim {
-            determinant = Expression::BinOp {
-                left: Box::new(determinant.to_owned()),
-                op: operator.to_owned(),
-                right: Box::new(Expression::BinOp {
-                    left: Box::new(values[i*dim].to_owned()),
-                    op: "*".to_string(),
-                    right: Box::new(det_matrix(get_minors(values.to_owned(), dim, i))),
-                }),
-            };
-
-            operator = if operator == String::from("+") {
-                String::from("-")
-            } else {
-                String::from("+")
-            };
-        }
-
-        determinant
-    }
 }

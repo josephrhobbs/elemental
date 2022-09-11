@@ -11,7 +11,10 @@ use std::{
 
 use colored::*;
 
-use crate::standard::get_std_function;
+use crate::{
+    standard::get_std_function,
+    Matrix,
+};
 
 /// Defines the expression types that are available in Elemental.
 #[derive(Clone, Debug)]
@@ -224,28 +227,66 @@ impl Expression {
                     new.push(val.simplify(variables));
                 }
 
-                Expression::Matrix {
-                    rows: *r,
-                    cols: *c,
-                    values: new,
+                if *r == 1 && *c == 1 {
+                    v[0].to_owned()
+                } else {
+                    Expression::Matrix {
+                        rows: *r,
+                        cols: *c,
+                        values: new,
+                    }
                 }
             },
 
             // To simplify a call, look up the function in the standard library
             // and pass the arguments necessary
+            // 
+            // In Elemental, all functions act on matrices.  
             Expression::Call {
                 name: n,
                 args: a,
             } => {
-                let stdfn: fn(Vec<Expression>) -> Expression = get_std_function(n.to_owned());
-
-                // Simplify each value in `a` before passing to the function
-                let mut args = Vec::new();
+                // Simplify each argument and convert them to "native" matrices.
+                let mut args = Vec::<Matrix>::new();
                 for arg in a {
-                    args.push(arg.simplify(variables));
+                    let simplified = arg.simplify(variables);
+                    if let Expression::Matrix {
+                        rows: r,
+                        cols: c,
+                        values: v,
+                    } = simplified {
+                        // Convert each value in the matrix from `Expression` to `f64`.
+                        let mut values: Vec<f64> = Vec::new();
+                        for value in v {
+                            if let Self::Int (i) = value {
+                                values.push(i as f64);
+                            } else if let Self::Float (f) = value {
+                                values.push(f);
+                            } else {
+                                // A value in one of the matrices is not a numeric literal
+                                todo!()
+                            }
+                        }
+                        args.push(Matrix::new(r, c, values));
+                    } else if let Expression::Int (i) = simplified {
+                        // If one value is a number, convert it into a 1x1 matrix
+                        args.push(Matrix::new(1, 1, vec![i as f64]));
+                    } else {
+                        // One of the arguments is not a matrix or a number
+                        todo!()
+                    }
                 }
 
-                stdfn(args).simplify(variables)
+                let stdfn: fn(Vec<Matrix>) -> Matrix = get_std_function(n.to_owned());
+                let output_matrix = stdfn(args);
+
+                let values = output_matrix.copy_vals().iter().map(|x| Self::Float (*x)).collect::<Vec<Self>>();
+
+                Self::Matrix {
+                    rows: output_matrix.rows(),
+                    cols: output_matrix.cols(),
+                    values,
+                }.simplify(variables)
             },
             
             // `Nil` is already in simplest form

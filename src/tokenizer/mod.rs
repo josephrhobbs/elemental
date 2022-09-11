@@ -204,7 +204,30 @@ impl Tokenizer {
                 },
                 '\n' => Token::new(TokenClass::Newline, '\n'.to_string()),
                 '+' => Token::new(TokenClass::Plus, '+'.to_string()),
-                '-' => Token::new(TokenClass::Minus, '-'.to_string()),
+                '-' => {
+                    let chr = match charstream.peek() {
+                        Some(p) => p,
+                        None => todo!(),
+                    };
+                    if NUMERIC.contains(chr) {
+                        let raw = format!(
+                            "{}{}",
+                            c,
+                            charstream.get(NUMERIC),
+                        );
+                        
+                        let token = match str::parse::<i64>(&raw) {
+                            Ok(_) => Token::new(TokenClass::Int, raw),
+                            Err(_) => match str::parse::<f64>(&raw) {
+                                Ok(_) => Token::new(TokenClass::Float, raw),
+                                Err(_) => todo!(),
+                            },
+                        };
+                        token
+                    } else {
+                        Token::new(TokenClass::Minus, '-'.to_string())
+                    }
+                }
                 '*' => Token::new(TokenClass::Multiply, '*'.to_string()),
                 '/' => Token::new(TokenClass::Divide, '/'.to_string()),
                 ';' => Token::new(TokenClass::Semicolon, ';'.to_string()),

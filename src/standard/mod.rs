@@ -68,16 +68,31 @@ fn determinant(args: Vec<Expression>) -> Expression {
         if *r != *c {
             todo!()
         }
-
         det_matrix(v.to_owned())
     } else {
         todo!()
     }
 }
 
+/// Gets the matrix of minors (excluding row `row` and column `1`) given the values of a matrix.
+fn get_minors(values: Vec<Expression>, cols: usize, row: usize) -> Vec<Expression> {
+    let mut output = Vec::new();
+
+    for i in 0..values.len() {
+        if i%cols != 0 && i/cols != row {
+            output.push(values[i].to_owned());
+        }
+    }
+
+    output
+}
+
 /// Pure implementation of `determinant` for recursive calls.
 fn det_matrix(values: Vec<Expression>) -> Expression {
-    if values.len() == 4 {
+    let dim = (values.len() as f64).sqrt() as usize;
+    if dim == 1 {
+        values[0].to_owned()
+    } else if dim == 2 {
         Expression::BinOp {
             left: Box::new(Expression::BinOp {
                 left: Box::new(values[0].to_owned()),
@@ -92,12 +107,28 @@ fn det_matrix(values: Vec<Expression>) -> Expression {
             op: "-".to_string(),
         }
     } else {
-        let _determinant = 0;
+        let mut determinant = Expression::Int (0);
 
-        for _i in 0..((values.len() as f64).sqrt() as usize + 1) {
-            
+        let mut operator = String::from("+");
+
+        for i in 0..dim {
+            determinant = Expression::BinOp {
+                left: Box::new(determinant.to_owned()),
+                op: operator.to_owned(),
+                right: Box::new(Expression::BinOp {
+                    left: Box::new(values[i*dim].to_owned()),
+                    op: "*".to_string(),
+                    right: Box::new(det_matrix(get_minors(values.to_owned(), dim, i))),
+                }),
+            };
+
+            operator = if operator == String::from("+") {
+                String::from("-")
+            } else {
+                String::from("+")
+            };
         }
 
-        todo!()
+        determinant
     }
 }

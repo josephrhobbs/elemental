@@ -9,3 +9,7 @@ Coming soon!
 # Installing Elemental
 
 Coming soon!
+
+# License
+
+Elemental is licensed under the MIT license.  License text forthcoming.

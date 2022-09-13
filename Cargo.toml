@@ -1,5 +1,5 @@
 [package]
-name = "elemental-lang"
+name = "eltl"
 version = "0.1.0"
 edition = "2021"
 

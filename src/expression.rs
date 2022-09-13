@@ -133,11 +133,14 @@ impl Expression {
                 identifier: ref i,
                 value: ref v,
             } => {
-                // Register the variable
-                variables.insert(i.to_owned(), *v.to_owned());
+                // Simplify the value of assignment
+                let simplified = (**v).simplify(variables);
 
-                // Simplify the value of assignment and return it
-                (**v).simplify(variables).to_owned()
+                // Register the variable
+                variables.insert(i.to_owned(), simplified.to_owned());
+
+                // Return the simplified value
+                simplified.to_owned()
             }
 
             // Simplify the left and right and return
@@ -211,9 +214,17 @@ impl Expression {
                 }
             },
             
-            // `Int` and `Float` are both already in simplest form
+            // `Int is already in simplest form
             Expression::Int (_) => self.to_owned(),
-            Expression::Float (_) => self.to_owned(),
+
+            // `Float` can be reduced to `Int` if it has no fractional part
+            Expression::Float (f) => {
+                if f.fract() == 0.0 {
+                    Expression::Int (*f as i64)
+                } else {
+                    Expression::Float (*f)
+                }
+            },
             
             // To simplify a `Matrix`, simplify each value
             Expression::Matrix {
@@ -228,7 +239,7 @@ impl Expression {
                 }
 
                 if *r == 1 && *c == 1 {
-                    v[0].to_owned()
+                    v[0].simplify(variables).to_owned()
                 } else {
                     Expression::Matrix {
                         rows: *r,

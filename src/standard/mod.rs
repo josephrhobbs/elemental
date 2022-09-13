@@ -16,7 +16,8 @@ pub fn get_std_function(name: String) -> fn(Vec<Matrix>) -> Matrix {
     // Declarative standard library begins here
     hashmap.insert("t".to_string(), transpose);
     hashmap.insert("det".to_string(), determinant);
-    hashmap.insert("i".to_string(), identity);
+    hashmap.insert("I".to_string(), identity);
+    hashmap.insert("inv".to_string(), invert);
 
     match hashmap.get(&name) {
         Some(f) => *f,
@@ -46,6 +47,7 @@ fn transpose(args: Vec<Matrix>) -> Matrix {
     Matrix::new(rows, cols, result)
 }
 
+
 /// Compute the determinant of a matrix.
 fn determinant(args: Vec<Matrix>) -> Matrix {
     if args.len() != 1 {
@@ -62,7 +64,9 @@ fn determinant(args: Vec<Matrix>) -> Matrix {
 
     let dim = matrix.rows();
 
-    let det = if dim == 2 {
+    let det = if dim == 1 {
+        matrix[[0, 0]]
+    } else if dim == 2 {
         matrix[[0, 0]] * matrix[[1, 1]] - matrix[[1, 0]] * matrix[[0, 1]]
     } else {
         let mut d = 0.0f64;
@@ -132,4 +136,49 @@ fn identity(args: Vec<Matrix>) -> Matrix {
     }
 
     output
+}
+
+
+/// Computes the inverse of the given matrix.
+fn invert(args: Vec<Matrix>) -> Matrix {
+    if args.len() != 1 {
+        todo!()
+    }
+
+    let mut matrix = args[0].clone();
+    let rows = matrix.rows();
+    let cols = matrix.cols();
+
+    // Keep an original copy
+    let original = matrix.clone();
+    let original_det = determinant(vec![original.to_owned()])[[0, 0]];
+
+    // Step 1: For each cell, compute the determinant of the matrix of minors
+    // determined with respect to that cell
+    for i in 0..rows {
+        for j in 0..cols {
+            let matrix_of_minors = get_minors(&original, i, j);
+            let det = determinant(vec![matrix_of_minors])[[0, 0]];
+            matrix[[i, j]] = det;
+        }
+    }
+
+    // Step 2: For each cell, if `i + j` is odd, multiply the value by -1
+    // Step 4: Divide each value by the determinant of the original matrix
+    for i in 0..rows {
+        for j in 0..cols {
+            if (i + j)%2 != 0 {
+                matrix[[i, j]] = matrix[[i, j]] * -1.0f64;
+            }
+            matrix[[i, j]] = matrix[[i, j]] / original_det;
+        }
+    }
+
+    // Step 3: Transpose the matrix
+    matrix = transpose(vec![matrix]);
+
+    // Did Step 4 above
+
+    // We're done!
+    matrix.to_owned()
 }

@@ -3,46 +3,62 @@
 use crate::Matrix;
 
 use super::{
-    get_minors,
-    transpose,
-    detf64,
+    StdFunc,
+    GetMinors,
+    Transpose,
+    Determinant,
 };
 
-/// Computes the inverse of the given matrix.
-pub fn invert(matrix: &Matrix) -> Matrix {
-    let mut output = matrix.clone();
-    let rows = matrix.rows();
-    let cols = matrix.cols();
+#[derive(Clone)]
+pub struct Invert;
 
-    // Compute the determinant of the input matrix
-    let original_det = detf64(matrix);
+impl Invert {
+    /// Evaluates `Invert` while minimizing heap allocation.
+    pub fn evalpure(matrix: &Matrix) -> Matrix {
+        let mut output = matrix.clone();
+        let rows = matrix.rows();
+        let cols = matrix.cols();
 
-    // Step 1: For each cell, compute the determinant of the matrix of minors
-    // determined with respect to that cell
-    for i in 0..rows {
-        for j in 0..cols {
-            let matrix_of_minors = get_minors(matrix, i, j);
-            let det = detf64(&matrix_of_minors);
-            output[[i, j]] = det;
-        }
-    }
+        // Compute the determinant of the input matrix
+        let original_det = Determinant::evalpure(matrix);
 
-    // Step 2: For each cell, if `i + j` is odd, multiply the value by -1
-    // Step 4: Divide each value by the determinant of the original matrix
-    for i in 0..rows {
-        for j in 0..cols {
-            if (i + j)%2 != 0 {
-                output[[i, j]] = output[[i, j]] * -1.0f64;
+        // Step 1: For each cell, compute the determinant of the matrix of minors
+        // determined with respect to that cell
+        for i in 0..rows {
+            for j in 0..cols {
+                let matrix_of_minors = GetMinors::evalpure(matrix, i, j);
+                let det = Determinant::evalpure(&matrix_of_minors);
+                output[[i, j]] = det;
             }
-            output[[i, j]] = output[[i, j]] / original_det;
         }
+
+        // Step 2: For each cell, if `i + j` is odd, multiply the value by -1
+        // Step 4: Divide each value by the determinant of the original matrix
+        for i in 0..rows {
+            for j in 0..cols {
+                if (i + j)%2 != 0 {
+                    output[[i, j]] = output[[i, j]] * -1.0f64;
+                }
+                output[[i, j]] = output[[i, j]] / original_det;
+            }
+        }
+
+        // Step 3: Transpose the matrix
+        output = Transpose::evalpure(&output);
+
+        // Did Step 4 above
+
+        // We're done!
+        output
     }
+}
 
-    // Step 3: Transpose the matrix
-    output = transpose(&output);
+impl StdFunc for Invert {
+    fn eval(&self, args: Vec<Matrix>) -> Matrix {
+        if args.len() != 1 {
+            todo!()
+        }
 
-    // Did Step 4 above
-
-    // We're done!
-    output
+        Self::evalpure(&args[0])
+    }
 }

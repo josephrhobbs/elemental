@@ -10,44 +10,38 @@ pub mod identity;
 pub mod invert;
 pub mod get_minors;
 
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    rc::Rc,
+};
 
 use crate::Matrix;
 
-pub use determinant::{
-    determinant,
-    detf64,
-};
-pub use transpose::transpose;
-pub use identity::identity;
-pub use invert::invert;
-pub use get_minors::get_minors;
+pub use determinant::Determinant;
+pub use transpose::Transpose;
+pub use identity::Identity;
+pub use invert::Invert;
+pub use get_minors::GetMinors;
 
 
-/// Get a function pointer based on that function's name.
-pub fn get_std_function(name: String) -> impl Fn(Vec<Matrix>) -> Matrix {
-    let mut hashmap: HashMap<String, fn(&Matrix) -> Matrix> = HashMap::new();
-
-    // Declarative standard library begins here
-    hashmap.insert("t".to_string(), transpose);
-    hashmap.insert("det".to_string(), determinant);
-    hashmap.insert("I".to_string(), identity);
-    hashmap.insert("inv".to_string(), invert);
-
-    match hashmap.get(&name) {
-        Some(f) => wrap(*f),
-        None => todo!(),
-    }
+/// Any function available in the standard library satisfies this trait.
+pub trait StdFunc {
+    fn eval(&self, args: Vec<Matrix>) -> Matrix;
 }
 
 
-/// Wraps a `fn(&Matrix) -> Matrix` with a `fn(Vec<Matrix>) -> Matrix`.  Facilitates compatibility with Elemental's standard library.
-fn wrap(func: fn(&Matrix) -> Matrix) -> impl Fn(Vec<Matrix>) -> Matrix {
-    move |vec| {
-        if vec.len() != 1 {
-            todo!();
-        }
+/// Get a function pointer based on that function's name.
+pub fn get_std_function(name: String) -> Rc<dyn StdFunc> {
+    let mut hashmap: HashMap<String, Rc<dyn StdFunc>> = HashMap::new();
 
-        func(&vec[0])
+    // Declarative standard library begins here
+    hashmap.insert("t".to_string(), Rc::new(Transpose {}));
+    hashmap.insert("det".to_string(), Rc::new(Determinant {}));
+    hashmap.insert("I".to_string(), Rc::new(Identity {}));
+    hashmap.insert("inv".to_string(), Rc::new(Invert {}));
+
+    match hashmap.get(&name) {
+        Some(f) => f.clone(),
+        None => todo!(),
     }
 }

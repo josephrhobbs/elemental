@@ -16,6 +16,7 @@ use std::{
 };
 
 use crate::Matrix;
+use crate::error::*;
 
 pub use determinant::Determinant;
 pub use transpose::Transpose;
@@ -27,6 +28,18 @@ pub use get_minors::GetMinors;
 /// Any function available in the standard library satisfies this trait.
 pub trait StdFunc {
     fn eval(&self, args: Vec<Matrix>) -> Matrix;
+}
+
+
+/// A unit struct passed by `get_std_function` when a function is not found.
+/// 
+/// This allows the interpreter to continue working without panicking.
+pub struct Error;
+
+impl StdFunc for Error {
+    fn eval(&self, _args: Vec<Matrix>) -> Matrix {
+        Matrix::new(0, 0, Vec::new())
+    }
 }
 
 
@@ -42,6 +55,9 @@ pub fn get_std_function(name: String) -> Rc<dyn StdFunc> {
 
     match hashmap.get(&name) {
         Some(f) => f.clone(),
-        None => todo!(),
+        None => {
+            throw(CouldNotFindFunction);
+            Rc::new(Error {})
+        },
     }
 }

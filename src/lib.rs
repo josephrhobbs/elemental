@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-mod error;
+pub mod error;
 mod tokenizer;
 mod parser;
 mod standard;

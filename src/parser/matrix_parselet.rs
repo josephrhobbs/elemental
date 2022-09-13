@@ -1,6 +1,7 @@
 //! A parselet for matrix (and vector) input.
 
 use crate::parselet_utils::*;
+use crate::error::*;
 
 pub struct MatrixParselet;
 
@@ -14,7 +15,10 @@ impl PrefixParselet for MatrixParselet {
 
         let mut current = match tokenizer.peek() {
             Some(t) => t,
-            None => todo!(),
+            None => {
+                throw(UnexpectedEof);
+                return Expression::Nil;
+            },
         };
 
         // Count the number of values in the first row (number of columns in the matrix)
@@ -26,7 +30,10 @@ impl PrefixParselet for MatrixParselet {
 
             current = match tokenizer.peek() {
                 Some(t) => t,
-                None => todo!(),
+                None => {
+                    throw(UnexpectedEof);
+                    return Expression::Nil;
+                },
             };
             if current.get_class() == TokenClass::CloseBracket {
                 break;

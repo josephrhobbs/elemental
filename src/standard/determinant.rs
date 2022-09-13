@@ -1,6 +1,7 @@
 //! Computes matrix determinants.
 
 use crate::Matrix;
+use crate::error::*;
 
 use super::{
     StdFunc,
@@ -14,7 +15,8 @@ impl Determinant {
     pub fn evalpure(matrix: &Matrix) -> f64 {
         if matrix.rows() != matrix.cols() {
             // Square matrices only
-            todo!()
+            throw(SquareMatrixRequired);
+            return 0.0;
         }
     
         let dim = matrix.rows();
@@ -51,7 +53,8 @@ impl Determinant {
 impl StdFunc for Determinant {
     fn eval(&self, args: Vec<Matrix>) -> Matrix {
         if args.len() != 1 {
-            todo!();
+            throw(WrongNumberOfArgs);
+            return Matrix::new(0, 0, Vec::new());
         }
 
         Matrix::new(1, 1, vec![Self::evalpure(&args[0])])

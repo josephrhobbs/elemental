@@ -1,6 +1,7 @@
 //! Generates identity matrices.
 
 use crate::Matrix;
+use crate::error::*;
 
 use super::StdFunc;
 
@@ -10,7 +11,8 @@ pub struct Identity;
 impl Identity {
     pub fn evalpure(matrix: &Matrix) -> Matrix {
         if matrix.rows() != 1 || matrix.cols() != 1 {
-            todo!()
+            throw(RequiresUnitMatrix);
+            return Matrix::new(0, 0, Vec::new());
         }
     
         let dim = matrix[[0, 0]] as usize;
@@ -32,7 +34,8 @@ impl Identity {
 impl StdFunc for Identity {
     fn eval(&self, args: Vec<Matrix>) -> Matrix {
         if args.len() != 1 {
-            todo!();
+            throw(WrongNumberOfArgs);
+            return Matrix::new(0, 0, Vec::new());
         }
 
         Self::evalpure(&args[0])

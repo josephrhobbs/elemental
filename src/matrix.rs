@@ -8,6 +8,8 @@ use std::ops::{
     IndexMut,
 };
 
+use crate::error::*;
+
 /// Abstracts over matrices.
 #[derive(Clone, Debug)]
 pub struct Matrix {
@@ -68,7 +70,8 @@ impl Add for Matrix {
 
     fn add(self, other: Self) -> Self {
         if self.rows() != other.rows() || self.cols() != other.cols() {
-            todo!()
+            throw(ImproperDimensions);
+            Self::new(0, 0, Vec::new());
         }
 
         let mut output_vals = Vec::new();
@@ -90,7 +93,8 @@ impl Sub for Matrix {
 
     fn sub(self, other: Self) -> Self {
         if self.rows() != other.rows() || self.cols() != other.cols() {
-            todo!()
+            throw(ImproperDimensions);
+            Self::new(0, 0, Vec::new());
         }
 
         let mut output_vals = Vec::new();
@@ -112,7 +116,7 @@ impl Mul for Matrix {
 
     #[allow(unused_variables)]
     fn mul(self, other: Self) -> Self {
-        todo!()
+        Self::new(0, 0, Vec::new())
     }
 }
 

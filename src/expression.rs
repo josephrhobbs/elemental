@@ -9,12 +9,12 @@ use std::{
     collections::HashMap,
 };
 
-use colored::*;
-
 use crate::{
     standard::get_std_function,
     Matrix,
 };
+
+use crate::error::*;
 
 /// Defines the expression types that are available in Elemental.
 #[derive(Clone, Debug)]
@@ -102,7 +102,7 @@ impl Display for Expression {
                 name: _,
                 args: _,
             } => {
-                todo!()
+                unreachable!()
             }
             Expression::Nil => {
                 write!(f, "")
@@ -120,7 +120,7 @@ impl Expression {
                 let expr = match variables.get(s) {
                     Some(e) => (*e).to_owned(),
                     None => {
-                        print!("{}: variable {} has not been declared", "error".red().bold(), s);
+                        throw(UndeclaredVariable (s.to_string()));
                         return Expression::Nil;
                     },
                 };
@@ -180,7 +180,8 @@ impl Expression {
                             values,
                         }
                     } else {
-                        todo!()
+                        throw(InvalidOperands);
+                        return Expression::Nil;
                     }
                 } else if let Expression::Float (l) = left {
                     if let Expression::Int (r) = right {
@@ -189,7 +190,8 @@ impl Expression {
                     } else if let Expression::Float (r) = right {
                         Expression::Float (binop_float(l, r, &o))
                     } else {
-                        todo!()
+                        throw(InvalidOperands);
+                        return Expression::Nil;
                     }
                 } else if let Expression::Matrix {
                     rows: r,
@@ -202,15 +204,18 @@ impl Expression {
                         values: vr,
                     } = right {
                         if k1 != k2 {
-                            todo!()
+                            throw(ImproperDimensions);
+                            return Expression::Nil;
                         }
 
                         matrix_dot(vl, vr, r, c, k1)
                     } else {
-                        todo!()
+                        throw(InvalidOperands);
+                        return Expression::Nil;
                     }
                 } else {
-                    todo!()
+                    throw(InvalidOperands);
+                    return Expression::Nil;
                 }
             },
             
@@ -275,7 +280,8 @@ impl Expression {
                                 values.push(f);
                             } else {
                                 // A value in one of the matrices is not a numeric literal
-                                todo!()
+                                throw(InvalidValue);
+                                return Expression::Nil;
                             }
                         }
                         args.push(Matrix::new(r, c, values));
@@ -284,7 +290,7 @@ impl Expression {
                         args.push(Matrix::new(1, 1, vec![i as f64]));
                     } else {
                         // One of the arguments is not a matrix or a number
-                        todo!()
+                        throw(InvalidOperands);
                     }
                 }
 
@@ -314,7 +320,10 @@ pub fn binop_int(x: i64, y: i64, binop: &str) -> i64 {
         "-" => x - y,
         "*" => x * y,
         "/" => x / y,
-        _ => todo!(),
+        _ => {
+            throw(InvalidOperator);
+            0
+        },
     }
 }
 
@@ -326,7 +335,10 @@ pub fn binop_float(x: f64, y: f64, binop: &str) -> f64 {
         "-" => x - y,
         "*" => x * y,
         "/" => x / y,
-        _ => todo!(),
+        _ => {
+            throw(InvalidOperator);
+            0.0
+        },
     }
 }
 

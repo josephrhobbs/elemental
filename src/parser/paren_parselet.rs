@@ -1,6 +1,7 @@
 //! A parselet for parentheticals.
 
 use crate::parselet_utils::*;
+use crate::error::*;
 
 pub struct ParenParselet;
 
@@ -9,14 +10,20 @@ impl PrefixParselet for ParenParselet {
         // Get the expression inside the parenthetical
         let next = match tokenizer.peek() {
             Some(t) => t,
-            None => todo!(),
+            None => {
+                throw(UnexpectedEof);
+                return Expression::Nil;
+            },
         };
 
         let expr = parser.parse(tokenizer, next.get_class().into());
 
         let next = match tokenizer.peek() {
             Some(t) => t,
-            None => todo!(),
+            None => {
+                throw(UnexpectedEof);
+                return Expression::Nil;
+            },
         };
 
         if next.get_class() == TokenClass::CloseParen {
@@ -25,7 +32,8 @@ impl PrefixParselet for ParenParselet {
             
             expr
         } else {
-            todo!()
+            throw(ExpectedCloseParen);
+            return Expression::Nil;
         }
     }
 }

@@ -1,5 +1,6 @@
 //! Provides a tokenizer for the Elemental interpreter.
 
+use crate::error::*;
 
 /// Outlines the types of tokens that Elemental can process.
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Hash)]
@@ -190,7 +191,10 @@ impl Tokenizer {
                         Ok(_) => Token::new(TokenClass::Int, raw),
                         Err(_) => match str::parse::<f64>(&raw) {
                             Ok(_) => Token::new(TokenClass::Float, raw),
-                            Err(_) => todo!(),
+                            Err(_) => {
+                                throw(CouldNotParseNumeric);
+                                Token::new(TokenClass::Float, "0.0".to_string())
+                            },
                         },
                     };
                     token
@@ -200,14 +204,18 @@ impl Tokenizer {
                 } else if let Some(_) = charstream.peek() {
                     Token::new(TokenClass::Assignment, "=".to_string())
                 } else {
-                    todo!()
+                    throw(UnexpectedEof);
+                    Token::new(TokenClass::Newline, '\n'.to_string())
                 },
                 '\n' => Token::new(TokenClass::Newline, '\n'.to_string()),
                 '+' => Token::new(TokenClass::Plus, '+'.to_string()),
                 '-' => {
                     let chr = match charstream.peek() {
                         Some(p) => p,
-                        None => todo!(),
+                        None => {
+                            throw(UnexpectedEof);
+                            '\n'
+                        },
                     };
                     if NUMERIC.contains(chr) {
                         let raw = format!(
@@ -220,7 +228,10 @@ impl Tokenizer {
                             Ok(_) => Token::new(TokenClass::Int, raw),
                             Err(_) => match str::parse::<f64>(&raw) {
                                 Ok(_) => Token::new(TokenClass::Float, raw),
-                                Err(_) => todo!(),
+                                Err(_) => {
+                                    throw(CouldNotParseNumeric);
+                                    Token::new(TokenClass::Float, "0.0".to_string())
+                                },
                             },
                         };
                         token
@@ -235,7 +246,10 @@ impl Tokenizer {
                 ')' => Token::new(TokenClass::CloseParen, ')'.to_string()),
                 '[' => Token::new(TokenClass::OpenBracket, '['.to_string()),
                 ']' => Token::new(TokenClass::CloseBracket, ']'.to_string()),
-                _ => todo!(),
+                _ => {
+                    throw(UnexpectedEof);
+                    Token::new(TokenClass::Newline, '\n'.to_string())
+                },
             };
             tokens.push(token);
 

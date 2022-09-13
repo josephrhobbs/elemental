@@ -1,6 +1,7 @@
 //! A parselet for assignments.
 
 use crate::parselet_utils::*;
+use crate::error::*;
 
 pub struct AssignmentParselet;
 
@@ -10,7 +11,10 @@ impl InfixParselet for AssignmentParselet {
 
         let identifier = match left {
             Expression::Identifier (s) => s,
-            _ => todo!(),
+            _ => {
+                throw(ExpectedIdentifier);
+                return Expression::Nil;
+            },
         };
 
         Expression::Assignment {

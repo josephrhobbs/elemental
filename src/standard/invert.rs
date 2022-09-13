@@ -1,6 +1,7 @@
 //! Inverts matrices.
 
 use crate::Matrix;
+use crate::error::*;
 
 use super::{
     StdFunc,
@@ -56,7 +57,8 @@ impl Invert {
 impl StdFunc for Invert {
     fn eval(&self, args: Vec<Matrix>) -> Matrix {
         if args.len() != 1 {
-            todo!()
+            throw(WrongNumberOfArgs);
+            return Matrix::new(0, 0, Vec::new());
         }
 
         Self::evalpure(&args[0])

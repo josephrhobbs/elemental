@@ -11,6 +11,7 @@ use std::{
 use colored::*;
 
 use elemental::interpret;
+use elemental::error::*;
 
 const VERSION: &str = "0.1.0";
 
@@ -30,12 +31,12 @@ fn main() -> ! {
         print!(">>> ");
         match stdout.flush() {
             Ok(_) => (),
-            Err(_) => todo!(),
+            Err(_) => throw(CouldNotFlushOutput),
         };
 
         match stdin.read_line(&mut input) {
             Ok(_) => (),
-            Err(_) => todo!(),
+            Err(_) => throw(CouldNotReadStdin),
         };
 
         let (expression, is_silent) = interpret(&mut variables, input.to_owned());

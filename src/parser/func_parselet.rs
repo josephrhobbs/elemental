@@ -1,6 +1,7 @@
 //! A parselet for function calls.
 
 use crate::parselet_utils::*;
+use crate::error::*;
 
 pub struct FuncParselet;
 
@@ -13,7 +14,10 @@ impl InfixParselet for FuncParselet {
 
             let mut current = match tokenizer.peek() {
                 Some(t) => t,
-                None => todo!(),
+                None => {
+                    throw(UnexpectedEof);
+                    return Expression::Nil;
+                },
             };
 
             while current.get_class() != TokenClass::CloseParen {
@@ -34,7 +38,8 @@ impl InfixParselet for FuncParselet {
                 args,
             }
         } else {
-            todo!()
+            throw(ExpectedIdentifier);
+            return Expression::Nil;
         }
     }
 }

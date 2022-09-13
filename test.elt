@@ -1,15 +1,18 @@
 // A brief look at some of the functions of Elemental
 
-x = 3
+x = 3;
 
-A =
-[1 2 3
- 4 5 6
- 7 8 9]
+A = [1 2 2; 4 3 6; 7 8 9];
 
-print(A*x)
+x * A
 
 // This will print:
 // [3  6  9
 //  12 15 18
 //  21 24 27]
+
+
+det(A)
+
+
+det(A) * A * inv(A)

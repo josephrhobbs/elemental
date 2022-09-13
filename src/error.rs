@@ -19,6 +19,7 @@ pub enum Error {
     ExpectedIdentifier,
     ExpectedCloseParen,
     UndeclaredVariable (String),
+    CouldNotReadFile (String),
 }
 
 pub use Error::*;
@@ -42,6 +43,7 @@ pub fn throw(error: Error) {
         ExpectedIdentifier => "expected identifier".to_string(),
         ExpectedCloseParen => "expected closing parenthesis".to_string(),
         UndeclaredVariable (s) => format!("found undeclared variable {}", s),
+        CouldNotReadFile (s) => format!("could not read file {}", s),
     };
 
     println!("{}: {}", "error".bold().red(), message);

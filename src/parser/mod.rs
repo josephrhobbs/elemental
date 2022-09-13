@@ -31,12 +31,12 @@ impl From<TokenClass> for u8 {
     fn from(t: TokenClass) -> u8 {
         match t {
             TokenClass::Assignment => 1,
-            TokenClass::OpenParen => 2,
             TokenClass::Plus => 3,
             TokenClass::Minus => 3,
             TokenClass::Multiply => 4,
             TokenClass::Divide => 4,
-            TokenClass::OpenBracket => 5,
+            TokenClass::OpenParen => 5,
+            TokenClass::OpenBracket => 6,
             _ => 0,
         }
     }

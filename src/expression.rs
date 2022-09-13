@@ -288,7 +288,7 @@ impl Expression {
                     }
                 }
 
-                let stdfn: fn(Vec<Matrix>) -> Matrix = get_std_function(n.to_owned());
+                let stdfn = get_std_function(n.to_owned());
                 let output_matrix = stdfn(args);
 
                 let values = output_matrix.copy_vals().iter().map(|x| Self::Float (*x)).collect::<Vec<Self>>();

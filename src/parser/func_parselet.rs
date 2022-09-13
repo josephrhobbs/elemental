@@ -34,7 +34,6 @@ impl InfixParselet for FuncParselet {
                 args,
             }
         } else {
-            dbg!(&left);
             todo!()
         }
     }

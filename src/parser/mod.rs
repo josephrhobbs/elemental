@@ -77,7 +77,7 @@ impl Parser {
         infix_parselets.insert(TokenClass::Minus, Box::new(BinOpParselet {}));
         infix_parselets.insert(TokenClass::Multiply, Box::new(BinOpParselet {}));
         infix_parselets.insert(TokenClass::Divide, Box::new(BinOpParselet {}));
-        infix_parselets.insert(TokenClass::OpenBracket, Box::new(FuncParselet {}));
+        infix_parselets.insert(TokenClass::OpenParen, Box::new(FuncParselet {}));
 
         Self {
             prefix_parselets,

@@ -17,7 +17,6 @@ impl PrefixParselet for ParenParselet {
         if next.get_class() == TokenClass::CloseParen {
             expr
         } else {
-            dbg!(&next);
             todo!()
         }
     }

@@ -5,7 +5,7 @@ use crate::parselet_utils::*;
 pub struct FuncParselet;
 
 impl InfixParselet for FuncParselet {
-    fn parse(&self, parser: &Parser, tokenizer: &mut Tokenizer, token: Token, left: Expression) -> Expression {
+    fn parse(&self, parser: &Parser, tokenizer: &mut Tokenizer, _token: Token, left: Expression) -> Expression {
         if let Expression::Identifier (s) = left {
             let mut args = Vec::new();
 
@@ -16,8 +16,8 @@ impl InfixParselet for FuncParselet {
                 None => todo!(),
             };
 
-            while current.get_class() != TokenClass::CloseBracket {
-                let arg = parser.parse(tokenizer, token.get_class().into());
+            while current.get_class() != TokenClass::CloseParen {
+                let arg = parser.parse(tokenizer, current.get_class().into());
                 args.push(arg);
 
                 current = match tokenizer.peek() {

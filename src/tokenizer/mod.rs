@@ -17,6 +17,7 @@ pub enum TokenClass {
     Semicolon,
     Comma,
     Newline,
+    Prime,
     OpenParen,
     CloseParen,
     OpenBracket,
@@ -248,6 +249,7 @@ impl Tokenizer {
                 '[' => Token::new(TokenClass::OpenBracket, '['.to_string()),
                 ']' => Token::new(TokenClass::CloseBracket, ']'.to_string()),
                 ',' => Token::new(TokenClass::Comma, ';'.to_string()),
+                '\'' => Token::new(TokenClass::Prime, '\''.to_string()),
                 _ => {
                     throw(UnexpectedEof);
                     Token::new(TokenClass::Newline, '\n'.to_string())

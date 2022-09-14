@@ -16,7 +16,7 @@ use colored::*;
 use elemental::interpret;
 use elemental::error::*;
 
-const VERSION: &str = "0.3.0";
+const VERSION: &str = "0.4.0";
 
 fn main() {
     if env::args().len() < 2 {

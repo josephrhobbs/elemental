@@ -7,6 +7,7 @@ mod binop_parselet;
 mod paren_parselet;
 mod matrix_parselet;
 mod func_parselet;
+mod prime_parselet;
 
 use std::collections::HashMap;
 
@@ -24,6 +25,7 @@ use binop_parselet::BinOpParselet;
 use paren_parselet::ParenParselet;
 use matrix_parselet::MatrixParselet;
 use func_parselet::FuncParselet;
+use prime_parselet::PrimeParselet;
 
 
 /// Converts a token class into a precedence value.
@@ -35,8 +37,9 @@ impl From<TokenClass> for u8 {
             TokenClass::Minus => 3,
             TokenClass::Multiply => 4,
             TokenClass::Divide => 4,
-            TokenClass::OpenParen => 5,
-            TokenClass::OpenBracket => 6,
+            TokenClass::Prime => 5,
+            TokenClass::OpenParen => 6,
+            TokenClass::OpenBracket => 7,
             _ => 0,
         }
     }
@@ -78,6 +81,7 @@ impl Parser {
         infix_parselets.insert(TokenClass::Multiply, Box::new(BinOpParselet {}));
         infix_parselets.insert(TokenClass::Divide, Box::new(BinOpParselet {}));
         infix_parselets.insert(TokenClass::OpenParen, Box::new(FuncParselet {}));
+        infix_parselets.insert(TokenClass::Prime, Box::new(PrimeParselet {}));
 
         Self {
             prefix_parselets,

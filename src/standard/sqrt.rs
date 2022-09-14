@@ -9,7 +9,7 @@ use super::StdFunc;
 pub struct Sqrt;
 
 impl Sqrt {
-    /// Evaluates `Invert` while minimizing heap allocation.
+    /// Evaluates `Sqrt` while minimizing heap allocation.
     pub fn evalpure(matrix: &Matrix) -> Matrix {
         let mut output = Vec::new();
         let rows = matrix.rows();

@@ -13,6 +13,8 @@ mod sqrt;
 mod sin;
 mod cos;
 mod exit;
+mod cross;
+mod dot;
 
 use std::{
     collections::HashMap,
@@ -31,6 +33,8 @@ pub use sqrt::Sqrt;
 pub use sin::Sin;
 pub use cos::Cos;
 pub use exit::Exit;
+pub use cross::Cross;
+pub use dot::Dot;
 
 /// Any function available in the standard library satisfies this trait.
 pub trait StdFunc {
@@ -63,6 +67,8 @@ pub fn get_std_function(name: String) -> Rc<dyn StdFunc> {
     hashmap.insert("sin".to_string(), Rc::new(Sin {}));
     hashmap.insert("cos".to_string(), Rc::new(Cos {}));
     hashmap.insert("exit".to_string(), Rc::new(Exit {}));
+    hashmap.insert("cross".to_string(), Rc::new(Cross {}));
+    hashmap.insert("dot".to_string(), Rc::new(Dot {}));
 
     match hashmap.get(&name) {
         Some(f) => f.clone(),

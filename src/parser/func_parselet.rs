@@ -28,6 +28,10 @@ impl InfixParselet for FuncParselet {
                     Some(t) => t,
                     None => break,
                 };
+
+                if current.get_class() == TokenClass::Comma {
+                    tokenizer.next();
+                }
             }
 
             // Consume the closing parenthesis

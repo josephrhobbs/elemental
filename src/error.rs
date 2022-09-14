@@ -36,7 +36,7 @@ pub fn throw(error: Error) {
         InvalidOperator => "invalid operator".to_string(),
         InvalidValue => "at least one value in this matrix is not a numeric literal".to_string(),
         CouldNotParseNumeric => "could not parse numeric input".to_string(),
-        UnexpectedEof => "unexpected end of token stream".to_string(),
+        UnexpectedEof => "unexpected token or end of token stream".to_string(),
         CouldNotFindFunction => "could not find function in standard library".to_string(),
         WrongNumberOfArgs => "wrong number of arguments passed to function".to_string(),
         RequiresUnitMatrix => "function requires a unit (1x1) matrix".to_string(),

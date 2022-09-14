@@ -40,16 +40,29 @@ impl PrefixParselet for MatrixParselet {
             }
         }
 
-        tokenizer.next();
-        current = match tokenizer.peek() {
-            Some(t) => t,
-
-            // Stop and return: this is a vector
+        match tokenizer.next() {
+            Some(t) => match t.get_class() {
+                // This is a vector
+                TokenClass::CloseBracket => return Expression::Matrix {
+                    rows: 1,
+                    cols,
+                    values,
+                },
+                _ => (),
+            },
+            // This is also a vector
             None => return Expression::Matrix {
                 rows: 1,
                 cols,
                 values,
             },
+        };
+
+        current = match tokenizer.peek() {
+            Some(t) => t,
+
+            // We already checked this above
+            None => unreachable!()
         };
 
         // Fill the remainder of the matrix

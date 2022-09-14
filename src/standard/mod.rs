@@ -4,11 +4,15 @@
 //! It exports a `HashMap` to the main interpreter, allowing the interpreter
 //! to connect function names to function definitions.
 
-pub mod determinant;
-pub mod transpose;
-pub mod identity;
-pub mod invert;
-pub mod get_minors;
+mod determinant;
+mod transpose;
+mod identity;
+mod invert;
+mod get_minors;
+mod sqrt;
+mod sin;
+mod cos;
+mod exit;
 
 use std::{
     collections::HashMap,
@@ -23,7 +27,10 @@ pub use transpose::Transpose;
 pub use identity::Identity;
 pub use invert::Invert;
 pub use get_minors::GetMinors;
-
+pub use sqrt::Sqrt;
+pub use sin::Sin;
+pub use cos::Cos;
+pub use exit::Exit;
 
 /// Any function available in the standard library satisfies this trait.
 pub trait StdFunc {
@@ -52,6 +59,10 @@ pub fn get_std_function(name: String) -> Rc<dyn StdFunc> {
     hashmap.insert("det".to_string(), Rc::new(Determinant {}));
     hashmap.insert("I".to_string(), Rc::new(Identity {}));
     hashmap.insert("inv".to_string(), Rc::new(Invert {}));
+    hashmap.insert("sqrt".to_string(), Rc::new(Sqrt {}));
+    hashmap.insert("sin".to_string(), Rc::new(Sin {}));
+    hashmap.insert("cos".to_string(), Rc::new(Cos {}));
+    hashmap.insert("exit".to_string(), Rc::new(Exit {}));
 
     match hashmap.get(&name) {
         Some(f) => f.clone(),

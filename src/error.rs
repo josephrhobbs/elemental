@@ -18,6 +18,7 @@ pub enum Error {
     SquareMatrixRequired,
     ExpectedIdentifier,
     ExpectedCloseParen,
+    DividedByZero,
     UndeclaredVariable (String),
     CouldNotReadFile (String),
 }
@@ -42,6 +43,7 @@ pub fn throw(error: Error) {
         SquareMatrixRequired => "function requires a square matrix".to_string(),
         ExpectedIdentifier => "expected identifier".to_string(),
         ExpectedCloseParen => "expected closing parenthesis".to_string(),
+        DividedByZero => "attempted to divide by zero".to_string(),
         UndeclaredVariable (s) => format!("found undeclared variable {}", s),
         CouldNotReadFile (s) => format!("could not read file {}", s),
     };

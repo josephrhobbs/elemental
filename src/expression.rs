@@ -319,7 +319,14 @@ pub fn binop_int(x: i64, y: i64, binop: &str) -> i64 {
         "+" => x + y,
         "-" => x - y,
         "*" => x * y,
-        "/" => x / y,
+        "/" => {
+            if y == 0 {
+                throw(DividedByZero);
+                0
+            } else {
+                x / y
+            }
+        },
         _ => {
             throw(InvalidOperator);
             0
@@ -334,7 +341,14 @@ pub fn binop_float(x: f64, y: f64, binop: &str) -> f64 {
         "+" => x + y,
         "-" => x - y,
         "*" => x * y,
-        "/" => x / y,
+        "/" => {
+            if y == 0.0 {
+                throw(DividedByZero);
+                0.0
+            } else {
+                x / y
+            }
+        },
         _ => {
             throw(InvalidOperator);
             0.0

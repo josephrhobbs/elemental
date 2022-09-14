@@ -155,10 +155,16 @@ impl Expression {
 
                 if let Expression::Int (l) = left {
                     if let Expression::Int (r) = right {
-                        Expression::Int (binop_int(l, r, &o))
+                        // Evaluate this as a float, then try to cast it to an `Int`
+                        let f = binop(l as f64, r as f64, &o);
+                        if f.fract() == 0.0 {
+                            Expression::Int (f as i64)
+                        } else {
+                            Expression::Float (f)
+                        }
                     } else if let Expression::Float (r) = right {
                         let left_float = l as f64;
-                        Expression::Float (binop_float(left_float, r, &o))
+                        Expression::Float (binop(left_float, r, &o))
                     } else if let Expression::Matrix {
                         rows: r,
                         cols: c,
@@ -186,9 +192,9 @@ impl Expression {
                 } else if let Expression::Float (l) = left {
                     if let Expression::Int (r) = right {
                         let right_float = r as f64;
-                        Expression::Float (binop_float(l, right_float, &o))
+                        Expression::Float (binop(l, right_float, &o))
                     } else if let Expression::Float (r) = right {
-                        Expression::Float (binop_float(l, r, &o))
+                        Expression::Float (binop(l, r, &o))
                     } else {
                         throw(InvalidOperands);
                         return Expression::Nil;
@@ -313,30 +319,8 @@ impl Expression {
 }
 
 
-/// Executes the given binary operation on two integers.
-pub fn binop_int(x: i64, y: i64, binop: &str) -> i64 {
-    match binop {
-        "+" => x + y,
-        "-" => x - y,
-        "*" => x * y,
-        "/" => {
-            if y == 0 {
-                throw(DividedByZero);
-                0
-            } else {
-                x / y
-            }
-        },
-        _ => {
-            throw(InvalidOperator);
-            0
-        },
-    }
-}
-
-
 /// Executes the given binary operation on two floats.
-pub fn binop_float(x: f64, y: f64, binop: &str) -> f64 {
+pub fn binop(x: f64, y: f64, binop: &str) -> f64 {
     match binop {
         "+" => x + y,
         "-" => x - y,

@@ -21,6 +21,8 @@ pub enum Error {
     DividedByZero,
     UndeclaredVariable (String),
     CouldNotReadFile (String),
+    CouldNotWriteToFile,
+    CouldNotDisplayPlot,
 }
 
 pub use Error::*;
@@ -46,6 +48,8 @@ pub fn throw(error: Error) {
         DividedByZero => "attempted to divide by zero".to_string(),
         UndeclaredVariable (s) => format!("found undeclared variable {}", s),
         CouldNotReadFile (s) => format!("could not read file {}", s),
+        CouldNotWriteToFile => "unable to export data to file".to_string(),
+        CouldNotDisplayPlot => "could not display plot in terminal".to_string(),
     };
 
     println!("{}: {}", "error".bold().red(), message);

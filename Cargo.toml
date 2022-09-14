@@ -3,7 +3,7 @@ name = "eltl"
 description = "An engineer's calculator.  Written in Rust."
 repository = "https://github.com/hobbsbros/elemental"
 license = "MIT"
-version = "0.5.0"
+version = "0.6.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -18,3 +18,4 @@ path = "src/lib.rs"
 
 [dependencies]
 colored = "2.0.0"
+plotlib = "0.5.1"

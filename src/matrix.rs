@@ -62,6 +62,15 @@ impl Matrix {
     pub fn vals_mut(&mut self) -> &mut Vec<f64> {
         &mut self.vals
     }
+
+    /// Generates an empty matrix.
+    pub fn empty() -> Self {
+        Self {
+            rows: 0,
+            cols: 0,
+            vals: Vec::new(),
+        }
+    }
 }
 
 /// Defines matrix addition.

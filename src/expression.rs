@@ -76,7 +76,7 @@ impl Display for Expression {
                         let index = i*c + j;
                         result.push_str(
                             &format!(
-                                "{:^8}",
+                                "{:^10}",
                                 format!("{}", v[index as usize])
                             )
                         );
@@ -294,6 +294,9 @@ impl Expression {
                     } else if let Expression::Int (i) = simplified {
                         // If one value is a number, convert it into a 1x1 matrix
                         args.push(Matrix::new(1, 1, vec![i as f64]));
+                    } else if let Expression::Float (f) = simplified {
+                        // If one value is a number, convert it into a 1x1 matrix
+                        args.push(Matrix::new(1, 1, vec![f]));
                     } else {
                         // One of the arguments is not a matrix or a number
                         throw(InvalidOperands);

@@ -37,9 +37,9 @@ impl From<TokenClass> for u8 {
             TokenClass::Minus => 3,
             TokenClass::Multiply => 4,
             TokenClass::Divide => 4,
-            TokenClass::Prime => 5,
             TokenClass::OpenParen => 6,
             TokenClass::OpenBracket => 7,
+            TokenClass::Prime => 8,
             _ => 0,
         }
     }

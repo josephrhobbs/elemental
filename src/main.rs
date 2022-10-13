@@ -13,10 +13,13 @@ use std::{
 
 use colored::*;
 
-use elemental::interpret;
-use elemental::error::*;
+use elemental::{
+    interpret,
+    error::*,
+    Expression
+};
 
-const VERSION: &str = "0.6.0";
+const VERSION: &str = "0.7.0";
 
 fn main() {
     if env::args().len() < 2 {
@@ -38,7 +41,10 @@ fn main() {
     };
 
     // Store a list of variables in the program
-    let mut variables = HashMap::new();
+    let mut variables = HashMap::from([
+        ("pi".to_string(), Expression::Float (3.141592653)),
+        ("deg".to_string(), Expression::Float (3.141592653/180.0)),
+    ]);
 
     for mut command in code {
         // For the tokenizer to work, we add `\n` to each line
@@ -66,8 +72,11 @@ fn interpreter() -> ! {
     let mut stdout = io::stdout();
 
     // Store a list of variables in the program
-    let mut variables = HashMap::new();
-
+    let mut variables = HashMap::from([
+        ("pi".to_string(), Expression::Float (3.141592653)),
+        ("deg".to_string(), Expression::Float (3.141592653/180.0)),
+    ]);
+    
     loop {
         // Prompt the user
         print!(">>> ");

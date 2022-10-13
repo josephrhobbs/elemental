@@ -17,6 +17,7 @@ mod cross;
 mod dot;
 mod linspace;
 mod plot;
+mod rotation;
 
 use std::{
     collections::HashMap,
@@ -39,6 +40,7 @@ pub use cross::Cross;
 pub use dot::Dot;
 pub use linspace::Linspace;
 pub use plot::Plt;
+pub use rotation::Rotation2d;
 
 /// Any function available in the standard library satisfies this trait.
 pub trait StdFunc {
@@ -75,6 +77,7 @@ pub fn get_std_function(name: String) -> Rc<dyn StdFunc> {
     hashmap.insert("dot".to_string(), Rc::new(Dot {}));
     hashmap.insert("linspace".to_string(), Rc::new(Linspace {}));
     hashmap.insert("plot".to_string(), Rc::new(Plt {}));
+    hashmap.insert("rot2".to_string(), Rc::new(Rotation2d {}));
 
     match hashmap.get(&name) {
         Some(f) => f.clone(),

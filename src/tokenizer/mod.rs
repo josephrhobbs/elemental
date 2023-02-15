@@ -149,7 +149,7 @@ const NUMERIC: &str = "01235456789.";
 
 
 /// Separators & whitespace.  To be ignored.
-const SEPARATORS: &str = " \t\n";
+const SEPARATORS: &str = " \t\n\r";
 
 
 /// Holds a stream of tokens.

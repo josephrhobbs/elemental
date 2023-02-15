@@ -16,7 +16,8 @@ use colored::*;
 use elemental::{
     interpret,
     error::*,
-    Expression
+    Expression,
+    get_std_variables,
 };
 
 const VERSION: &str = "0.7.0";
@@ -72,10 +73,7 @@ fn interpreter() -> ! {
     let mut stdout = io::stdout();
 
     // Store a list of variables in the program
-    let mut variables = HashMap::from([
-        ("pi".to_string(), Expression::Float (3.141592653)),
-        ("deg".to_string(), Expression::Float (3.141592653/180.0)),
-    ]);
+    let mut variables = get_std_variables();
     
     loop {
         // Prompt the user

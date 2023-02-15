@@ -18,13 +18,17 @@ mod dot;
 mod linspace;
 mod plot;
 mod rotation;
+mod routh;
 
 use std::{
     collections::HashMap,
     rc::Rc,
 };
 
-use crate::Matrix;
+use crate::{
+    Matrix,
+    Expression,
+};
 use crate::error::*;
 
 pub use determinant::Determinant;
@@ -41,6 +45,7 @@ pub use dot::Dot;
 pub use linspace::Linspace;
 pub use plot::Plt;
 pub use rotation::Rotation2d;
+pub use routh::Routh;
 
 /// Any function available in the standard library satisfies this trait.
 pub trait StdFunc {
@@ -78,6 +83,7 @@ pub fn get_std_function(name: String) -> Rc<dyn StdFunc> {
     hashmap.insert("linspace".to_string(), Rc::new(Linspace {}));
     hashmap.insert("plot".to_string(), Rc::new(Plt {}));
     hashmap.insert("rot2".to_string(), Rc::new(Rotation2d {}));
+    // hashmap.insert("routh".to_string(), Rc::new(Routh {}));
 
     match hashmap.get(&name) {
         Some(f) => f.clone(),
@@ -86,4 +92,13 @@ pub fn get_std_function(name: String) -> Rc<dyn StdFunc> {
             Rc::new(Error {})
         },
     }
+}
+
+
+/// Gets the standard variables stored in the program.
+pub fn get_std_variables() -> HashMap<String, Expression> {
+    HashMap::from([
+        ("pi".to_string(), Expression::Float (3.141592653)),
+        ("deg".to_string(), Expression::Float (3.141592653/180.0)),
+    ])
 }

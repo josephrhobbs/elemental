@@ -19,6 +19,7 @@ pub use parser::Parser;
 pub use expression::Expression;
 pub use matrix::Matrix;
 
+pub use standard::get_std_variables;
 
 /// Allows parselet files to easily access necessary
 /// abstractions without long `use` statements.

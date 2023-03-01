@@ -9,6 +9,7 @@ use super::StdFunc;
 pub struct Routh;
 
 impl Routh {
+    #[allow(dead_code)]
     pub fn evalpure(matrix: &Matrix) -> Matrix {
         if matrix.rows() != 1 {
             throw(RequiresUnitMatrix);
@@ -20,6 +21,7 @@ impl Routh {
 }
 
 impl StdFunc for Routh {
+    #[allow(unused_variables)]
     fn eval(&self, args: Vec<Matrix>) -> Matrix {
         Matrix::new(0, 0, Vec::new())
     }

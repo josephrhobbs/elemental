@@ -20,7 +20,7 @@ use elemental::{
     get_std_variables,
 };
 
-const VERSION: &str = "0.7.0";
+const VERSION: &str = "0.8.0";
 
 fn main() {
     if env::args().len() < 2 {

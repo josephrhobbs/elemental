@@ -77,7 +77,7 @@ impl Display for Expression {
                         result.push_str(
                             &format!(
                                 "{:^10}",
-                                format!("{}", v[index as usize])
+                                format!("{}", v[index])
                             )
                         );
 

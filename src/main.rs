@@ -96,6 +96,7 @@ fn interpreter() -> ! {
                 "{}",
                 expression,
             );
+            dbg!(&expression);
             println!("\n{}\n", output);
         }
 

@@ -118,14 +118,15 @@ impl Expression {
             // Look up the variable and plug in
             Expression::Identifier (s) => {
                 let expr = match variables.get(s) {
-                    Some(e) => (*e).to_owned(),
+                    Some(e) => {
+                        (*e).to_owned().simplify(variables)
+                    },
                     None => {
-                        throw(UndeclaredVariable (s.to_string()));
-                        return Expression::Nil;
+                        self.to_owned()
                     },
                 };
-                // Simplify
-                expr.simplify(variables)
+
+                expr
             },
 
             // Insert the assigned variable into the list of variables
@@ -186,8 +187,11 @@ impl Expression {
                             values,
                         }
                     } else {
-                        throw(InvalidOperands);
-                        return Expression::Nil;
+                        Expression::BinOp {
+                            left: Box::new(Expression::Int (l)),
+                            op: o.to_owned(),
+                            right: r.to_owned(),
+                        }
                     }
                 } else if let Expression::Float (l) = left {
                     if let Expression::Int (r) = right {
@@ -220,8 +224,7 @@ impl Expression {
                         return Expression::Nil;
                     }
                 } else {
-                    throw(InvalidOperands);
-                    return Expression::Nil;
+                    return self.to_owned();
                 }
             },
             
